@@ -1,17 +1,25 @@
-<div class="container">
-  <div class="row">
-    <div class="col-md" style="background-color: #cbe7cb; min-height: 100px">
-      <p>Categories</p>
-      <p>add category</p>
-      <form #categoryForm="ngForm" (ngSubmit)="onSubmit(categoryForm)">
-        <div class="form-group">
-          <input type="text" name="category" ngModel>
-        </div>
-        <div class="form-group">
-          <button type="submit" class="btn btn-info">Add category</button>
-        </div>
-      </form>
+<div class="col-md" style="background-color: #cbe7cb; min-height: 100px">
+  <p>Categories</p>
+  <p>{{actionCategory}} category</p>
+  <form #categoryForm="ngForm" (ngSubmit)="onSubmit(categoryForm)">
+    <div class="form-group">
+      <input type="text" name="category" [(ngModel)]="nameCategory">
+      <input type="text" name="id" [(ngModel)]="idCategory" hidden>
     </div>
-  </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-info">{{actionCategory}} category</button>
+    </div>
+  </form>
+  <br>
+  <h3>List of categories</h3>
+  <ul>
+    <li *ngFor="let category of categoryCollection; index as i">
+      {{i + 1}} -- {{category.data.category}}
+      <button class="btn btn-warning btn-sm" (click)="editCategory(category.data.category, category.id)">Edit</button>
+      <button class="btn btn-danger btn-sm" (click)="deleteCategory(category.id)">Delete</button>
+    </li>
+    <li *ngIf="loadingCategory"> Loading ...</li>
+  </ul>
 </div>
+
 

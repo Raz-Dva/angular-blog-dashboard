@@ -13,14 +13,21 @@ import { CategoriesComponent } from './categories/categories.component';
 import {FormsModule} from "@angular/forms";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
+import { AllPostsComponent } from './posts/all-posts/all-posts.component';
+import { NewPostComponent } from './posts/new-post/new-post.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { AngularEditorModule } from "@kolkov/angular-editor";
+import { HttpClientModule } from "@angular/common/http";
 
-  @NgModule({
+@NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     FooterComponent,
     DashboardComponent,
-    CategoriesComponent
+    CategoriesComponent,
+    AllPostsComponent,
+    NewPostComponent
   ],
   imports: [
     BrowserModule,
@@ -28,6 +35,9 @@ import { ToastrModule } from 'ngx-toastr';
     FormsModule,
     AngularFirestoreModule,
     BrowserAnimationsModule,
+    ReactiveFormsModule,
+    AngularEditorModule,
+    HttpClientModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     ToastrModule.forRoot(),
   ],

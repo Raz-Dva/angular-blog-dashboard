@@ -1,0 +1,42 @@
+<h3>Add new post</h3>
+<form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+  <div class="">
+    <label class="form-label">Title</label>
+    <input type="text" formControlName="title" class="form-control" (keyup)="createPermalink($event)">
+  </div>
+  <div class="">
+    <label class="form-label">Permalink</label>
+    <input type="text" formControlName="permalink" class="form-control">
+  </div>
+  <div class="">
+    <label class="form-label">Ex</label>
+    <textarea formControlName="excerpt" cols="30" rows="10" class="form-control"></textarea>
+  </div>
+  <div class="">
+    <label class="form-label">Select category</label>
+    <select formControlName="category" class="form-control">
+      <option *ngIf="categoriesLoading">Loading ...</option>
+      <option *ngFor="let category of categories">
+        {{category.data.category}}
+      </option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label">Select file</label>
+    <input type="file" formControlName="file" class="form-control" accept="image/*" (change)="showPreview($event)">
+    <div class="img-preview-box">
+      <img [src]="imgSrc" alt="" class="img-preview">
+    </div>
+  </div>
+  <div class="">
+    <label class="form-label">Content</label>
+    <angular-editor formControlName="content"></angular-editor>
+  </div>
+  <br>
+  <div>
+    <button type="submit" class="btn btn-sm btn-primary">Save Post</button>
+    <button routerLink="/" type="button" class="btn btn-sm btn-info">Back to Dashboard</button>
+  </div>
+</form>
+<br>
+
