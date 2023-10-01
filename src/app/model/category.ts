@@ -6,3 +6,8 @@ export interface CategoriesCollection {
   data: Category;
   id: string;
 }
+
+export interface FormCategory {
+  category: string;
+  id: string;
+}

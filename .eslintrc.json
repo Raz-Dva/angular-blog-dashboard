@@ -8,6 +8,7 @@
       "files": [
         "*.ts"
       ],
+      "parser": "@typescript-eslint/parser",
       "parserOptions": {
         "project": [
           "tsconfig.json"
@@ -18,6 +19,11 @@
         "plugin:@angular-eslint/recommended",
         "plugin:@angular-eslint/template/process-inline-templates",
         "plugin:prettier/recommended"
+//        "plugin:@typescript-eslint/recommended"
+      ],
+      "plugins": [
+        "unused-imports",
+        "@typescript-eslint"
       ],
       "rules": {
         "@angular-eslint/directive-selector": [
@@ -36,7 +42,8 @@
             "style": "kebab-case"
           }
         ],
-        "max-len": ["error", { "code": 87, "ignoreComments": true, "ignoreTemplateLiterals": true  }]
+        "max-len": ["error", { "code": 90, "ignoreComments": true, "ignoreTemplateLiterals": true  }],
+        "unused-imports/no-unused-imports": "error"
       }
     },
     {

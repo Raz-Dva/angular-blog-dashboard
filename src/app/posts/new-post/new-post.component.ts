@@ -1,7 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import {AbstractControl, FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {CategoriesService} from "src/app/services/categories.service";
-import {CategoriesCollection} from "src/app/model/category";
+import { Component, OnInit } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
+import { CategoriesService } from 'src/app/services/categories.service';
+import { CategoriesCollection } from 'src/app/model/category';
 type FormValue = {
   title: string;
   permalink: string;
@@ -9,7 +14,7 @@ type FormValue = {
   category: string;
   file: string;
   content: string;
-}
+};
 
 type FormControls<T> = {
   [P in keyof T]: AbstractControl<any, any>;
@@ -18,7 +23,7 @@ type FormControls<T> = {
 @Component({
   selector: 'app-new-post',
   templateUrl: './new-post.component.html',
-  styleUrls: ['./new-post.component.scss']
+  styleUrls: ['./new-post.component.scss'],
 })
 export class NewPostComponent implements OnInit {
   imgSrc: string | ArrayBuffer | null = './assets/images/no-img.png';
@@ -27,12 +32,19 @@ export class NewPostComponent implements OnInit {
   categoriesLoading = true;
   permalink = '';
 
-  constructor(private fb: FormBuilder, private categoriesService: CategoriesService) {
+  constructor(
+    private fb: FormBuilder,
+    private categoriesService: CategoriesService,
+  ) {
     this.postForm = this.fb.group({
-      title: ['', [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(3)]],
+      title: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(90),
+        ],
+      ],
       permalink: ['', [Validators.required]],
       excerpt: ['', [Validators.required, Validators.minLength(50)]],
       category: ['', [Validators.required]],
@@ -42,15 +54,15 @@ export class NewPostComponent implements OnInit {
   }
 
   get FC(): FormControls<FormValue> {
-    return this.postForm.controls  as FormControls<FormValue>;
+    return this.postForm.controls as FormControls<FormValue>;
   }
 
   ngOnInit(): void {
     this.postForm.controls['permalink'].disable();
     this.categoriesService.loadCategories().subscribe((categories) => {
       this.categories = categories;
-      this.categoriesLoading = false
-    })
+      this.categoriesLoading = false;
+    });
   }
 
   showPreview(event: Event): void {
@@ -64,9 +76,9 @@ export class NewPostComponent implements OnInit {
           if (e.target?.result) {
             this.imgSrc = e.target.result;
           }
-        }
+        };
 
-        reader.readAsDataURL(files[0])
+        reader.readAsDataURL(files[0]);
       }
     }
   }
@@ -79,5 +91,6 @@ export class NewPostComponent implements OnInit {
   }
 
   onSubmit(): void {
-  };
+    console.log();
+  }
 }

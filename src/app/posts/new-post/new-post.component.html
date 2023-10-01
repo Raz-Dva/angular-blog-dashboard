@@ -1,40 +1,100 @@
 <h3>Add new post</h3>
 <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+
   <div class="">
     <label class="form-label">Title</label>
-    <input type="text" formControlName="title" class="form-control" (keyup)="createPermalink($event)">
+    <input
+      type="text"
+      formControlName="title"
+      class="form-control"
+      (keyup)="createPermalink($event)"
+      [ngClass]="{'is-invalid': FC.title.touched && FC.title.invalid}">
+    <div>
+      <div class="alert alert-danger" *ngIf="FC.title.touched && FC.title.invalid && FC.title.errors?.required">
+        Title is required
+      </div>
+      <div class="alert alert-danger"
+           *ngIf="(FC.title.touched && FC.title.invalid) && ( FC.title.errors?.minlength || FC.title.errors?.maxlength)">
+        Title must contain a minimum of 10 characters and a maximum of 90.
+        <p *ngIf="FC.title.errors?.minlength?.actualLength || FC.title.errors?.maxlength?.actualLength">
+          The actual length is {{FC.title.errors?.minlength?.actualLength || FC.title.errors?.maxlength?.actualLength}}
+        </p>
+      </div>
+
+    </div>
   </div>
+
   <div class="">
     <label class="form-label">Permalink</label>
     <input type="text" formControlName="permalink" class="form-control">
   </div>
+
   <div class="">
-    <label class="form-label">Ex</label>
-    <textarea formControlName="excerpt" cols="30" rows="10" class="form-control"></textarea>
+    <label class="form-label">Excerpt</label>
+    <textarea
+      formControlName="excerpt"
+      cols="30"
+      rows="10"
+      class="form-control"
+      [ngClass]="{'is-invalid': FC.excerpt.touched && FC.excerpt.invalid}">
+    </textarea>
+    <div class="alert alert-danger" *ngIf="FC.excerpt.touched && FC.excerpt.invalid && FC.excerpt.errors?.required">
+      Excerpt is required
+    </div>
+    <div class="alert alert-danger"
+         *ngIf="FC.excerpt.touched && FC.excerpt.invalid &&  FC.excerpt.errors?.minlength">
+      Excerpt must contain a minimum of 50 characters.
+      <p *ngIf="FC.excerpt.errors?.minlength?.actualLength">
+        The actual length is {{FC.excerpt.errors?.minlength?.actualLength}}
+      </p>
+    </div>
   </div>
+
   <div class="">
     <label class="form-label">Select category</label>
-    <select formControlName="category" class="form-control">
+    <select
+      formControlName="category"
+      class="form-control"
+      [ngClass]="{'is-invalid': FC.category.touched && FC.category.invalid}">
       <option *ngIf="categoriesLoading">Loading ...</option>
-      <option *ngFor="let category of categories">
+      <option value="">Please select category</option>
+      <option *ngFor="let category of categories" [value]="category.data.category">
         {{category.data.category}}
       </option>
     </select>
+    <div class="alert alert-danger" *ngIf="FC.category.touched && FC.category.invalid && FC.category.errors?.required">
+      Category is required
+    </div>
   </div>
+
   <div>
     <label class="form-label">Select file</label>
-    <input type="file" formControlName="file" class="form-control" accept="image/*" (change)="showPreview($event)">
+    <input
+      type="file"
+      formControlName="file"
+      class="form-control"
+      accept="image/*"
+      (change)="showPreview($event)"
+      [ngClass]="{'is-invalid': FC.file.touched && FC.file.invalid}">
+    <div class="alert alert-danger" *ngIf="FC.file.touched && FC.file.invalid && FC.file.errors?.required">
+      File is required
+    </div>
     <div class="img-preview-box">
       <img [src]="imgSrc" alt="" class="img-preview">
     </div>
   </div>
+
   <div class="">
     <label class="form-label">Content</label>
     <angular-editor formControlName="content"></angular-editor>
+    <div class="alert alert-danger" *ngIf="FC.content.touched && FC.content.invalid && FC.content.errors?.required">
+      Content is required
+    </div>
   </div>
+
   <br>
   <div>
-    <button type="submit" class="btn btn-sm btn-primary">Save Post</button>
+    <button type="submit" class="btn btn-sm btn-primary" [disabled]="postForm.invalid">Save Post</button>
     <button routerLink="/" type="button" class="btn btn-sm btn-info">Back to Dashboard</button>
   </div>
 </form>
