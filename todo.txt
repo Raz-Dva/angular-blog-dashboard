@@ -1,3 +1,4 @@
 - sticky footer
 - on category page add 'back to dashboard'
 - validation of category input
+https://youtu.be/6zv1PTuqIIc?si=7DKVdd66ACzNS5hS&t=22638

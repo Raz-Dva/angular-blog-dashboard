@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CategoriesService } from 'src/app/services/categories.service';
-import { CategoriesCollection, FormCategory } from 'src/app/model/category';
+import {
+  CategoriesCollection,
+  FormCategory,
+} from 'src/app/model/category.interface';
 enum Actions {
   Add = 'Add',
   Edit = 'Edit',

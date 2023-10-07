@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Category, FormCategory } from 'src/app/model/category';
+import { Category, FormCategory } from 'src/app/model/category.interface';
 import { ToastrService } from 'ngx-toastr';
 import { Collections } from 'src/app/enums/collections.enum';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { CategoriesCollection } from 'src/app/model/category';
+import { CategoriesCollection } from 'src/app/model/category.interface';
 
 @Injectable({
   providedIn: 'root',

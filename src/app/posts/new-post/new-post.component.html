@@ -1,5 +1,5 @@
 <h3>Add new post</h3>
-<form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
 
   <div class="">
     <label class="form-label">Title</label>
@@ -58,7 +58,8 @@
       [ngClass]="{'is-invalid': FC.category.touched && FC.category.invalid}">
       <option *ngIf="categoriesLoading">Loading ...</option>
       <option value="">Please select category</option>
-      <option *ngFor="let category of categories" [value]="category.data.category">
+      <option *ngFor="let category of categories"
+              [ngValue]="{ category : category.data.category, categoryId: category.id }">
         {{category.data.category}}
       </option>
     </select>
@@ -94,7 +95,12 @@
 
   <br>
   <div>
-    <button type="submit" class="btn btn-sm btn-primary" [disabled]="postForm.invalid">Save Post</button>
+    <button type="submit" class="btn btn-sm btn-primary" [disabled]="form.invalid || isSubmitting">
+      <span
+            [ngClass]="{'spinner-border': isSubmitting, 'spinner-border-sm': isSubmitting }"
+            role="status" aria-hidden="true"></span>
+      Save Post
+    </button>
     <button routerLink="/" type="button" class="btn btn-sm btn-info">Back to Dashboard</button>
   </div>
 </form>

@@ -6,7 +6,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { CategoriesService } from 'src/app/services/categories.service';
-import { CategoriesCollection } from 'src/app/model/category';
+import { CategoriesCollection } from 'src/app/model/category.interface';
+import { PostsService } from 'src/app/services/posts.service';
+import { Post } from 'src/app/model/post';
+import { ToastrService } from 'ngx-toastr';
+import { tag } from 'rxjs-spy/operators';
+
 type FormValue = {
   title: string;
   permalink: string;
@@ -27,16 +32,19 @@ type FormControls<T> = {
 })
 export class NewPostComponent implements OnInit {
   imgSrc: string | ArrayBuffer | null = './assets/images/no-img.png';
-  postForm: FormGroup;
+  form: FormGroup;
   categories: CategoriesCollection[] | undefined;
   categoriesLoading = true;
-  permalink = '';
+  isSubmitting = false;
+  selectedImg: File | undefined;
 
   constructor(
     private fb: FormBuilder,
     private categoriesService: CategoriesService,
+    private postService: PostsService,
+    private toastr: ToastrService,
   ) {
-    this.postForm = this.fb.group({
+    this.form = this.fb.group({
       title: [
         '',
         [
@@ -47,18 +55,18 @@ export class NewPostComponent implements OnInit {
       ],
       permalink: ['', [Validators.required]],
       excerpt: ['', [Validators.required, Validators.minLength(50)]],
-      category: ['', [Validators.required]],
+      category: [''],
       file: [null, [Validators.required]],
       content: ['', [Validators.required]],
     });
   }
 
   get FC(): FormControls<FormValue> {
-    return this.postForm.controls as FormControls<FormValue>;
+    return this.form.controls as FormControls<FormValue>;
   }
 
   ngOnInit(): void {
-    this.postForm.controls['permalink'].disable();
+    this.form.controls['permalink'].disable();
     this.categoriesService.loadCategories().subscribe((categories) => {
       this.categories = categories;
       this.categoriesLoading = false;
@@ -79,6 +87,7 @@ export class NewPostComponent implements OnInit {
         };
 
         reader.readAsDataURL(files[0]);
+        this.selectedImg = files[0];
       }
     }
   }
@@ -86,11 +95,40 @@ export class NewPostComponent implements OnInit {
   createPermalink(event: KeyboardEvent): void {
     if (event.target instanceof HTMLInputElement) {
       const permalink = event.target.value.trim().replace(/\s+/g, '-');
-      this.postForm.controls.permalink.setValue(permalink);
+      this.form.controls.permalink.setValue(permalink);
     }
   }
 
   onSubmit(): void {
-    console.log();
+    this.isSubmitting = true;
+    const postFormValue = { ...this.form.value };
+    delete postFormValue.file;
+    const postData: Post = {
+      ...postFormValue,
+      permalink: this.form.controls['permalink'].value,
+      postImgPath: '',
+      isFeatured: false,
+      views: 0,
+      status: 'new',
+      createdAt: new Date(),
+    };
+
+    if (this.selectedImg) {
+      this.postService
+        .saveDataPost(this.selectedImg, postData)
+        .pipe(tag('1'))
+        .subscribe({
+          next: (result) => {
+            this.isSubmitting = false;
+            this.toastr.success(result.resultText);
+            this.form.reset();
+            this.imgSrc = './assets/images/no-img.png';
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            this.toastr.error(error.resultText);
+          },
+        });
+    }
   }
 }
