@@ -1,0 +1,10 @@
+.post-img-box {
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+
+  img {
+    max-width: 100px;
+    width: auto;
+  }
+}

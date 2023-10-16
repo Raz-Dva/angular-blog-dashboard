@@ -1,9 +1,13 @@
-export interface Category {
+export interface SingleCategory {
   category: string;
 }
+export interface Category {
+  category: string;
+  id: string;
+}
 
-export interface CategoriesCollection {
-  data: Category;
+export interface CategoryData {
+  data: SingleCategory;
   id: string;
 }
 

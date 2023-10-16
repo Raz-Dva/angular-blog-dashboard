@@ -1,37 +1,48 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Category, FormCategory } from 'src/app/model/category.interface';
+import {
+  AngularFirestore,
+  AngularFirestoreDocument,
+} from '@angular/fire/compat/firestore';
+import {
+  Category,
+  FormCategory,
+  SingleCategory,
+} from 'src/app/model/category.interface';
 import { ToastrService } from 'ngx-toastr';
 import { Collections } from 'src/app/enums/collections.enum';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { CategoriesCollection } from 'src/app/model/category.interface';
+import { CategoryData } from 'src/app/model/category.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoriesService {
   constructor(
-    private angFirestore: AngularFirestore,
+    private store: AngularFirestore,
     private toastr: ToastrService,
   ) {}
 
   saveCategory(data: Category): void {
     const { category } = data;
-    this.angFirestore
-      .collection<Category>(Collections.Categories)
+    this.store
+      .collection<SingleCategory>(Collections.Categories)
       .add({ category })
-      .then(() => {
-        this.toastr.success('Category added successfully');
+      .then((docRef) => {
+        if (docRef.id) {
+          this.toastr.success('Category added successfully');
+        } else {
+          this.toastr.error('Oops, error. Category has not been added');
+        }
       })
       .catch((error) => {
         console.log(error);
-        this.toastr.error('Error');
+        this.toastr.error('Oops, error. Category has not been added');
       });
   }
 
-  loadCategories(): Observable<CategoriesCollection[]> {
-    return this.angFirestore
+  loadCategories(): Observable<CategoryData[]> {
+    return this.store
       .collection<Category>(Collections.Categories)
       .snapshotChanges()
       .pipe(
@@ -45,29 +56,39 @@ export class CategoriesService {
       );
   }
 
-  updateCategory(id: string, data: FormCategory): void {
-    this.angFirestore
-      .doc<CategoriesCollection>(`categories/${id}`)
-      .update(data)
+  getCategoryById(id: string): AngularFirestoreDocument<CategoryData> {
+    return this.store.doc<CategoryData>(`categories/${id}`);
+  }
+
+  updateCategory(id: string, category: FormCategory): void {
+    this.store
+      .doc<CategoryData>(`categories/${id}`)
+      .update(category)
       .then(() => {
         this.toastr.success('Category updated successfully');
       })
       .catch((error) => {
-        console.log(error);
-        this.toastr.error('Error');
+        console.error(error);
+        this.toastr.error('Category update error');
       });
   }
 
   deleteCategory(id: string): void {
-    this.angFirestore
-      .doc<CategoriesCollection>(`categories/${id}`)
+    this.store
+      .doc<CategoryData>(`categories/${id}`)
       .delete()
       .then(() => {
-        this.toastr.success('Category deleted successfully');
+        this.getCategoryById(id)
+          .get()
+          .subscribe((doc) => {
+            if (!doc.exists) {
+              this.toastr.success('Category successfully deleted');
+            }
+          });
       })
       .catch((error) => {
-        console.log(error);
-        this.toastr.error('Error');
+        console.error(error);
+        this.toastr.error('Category delete error');
       });
   }
 }

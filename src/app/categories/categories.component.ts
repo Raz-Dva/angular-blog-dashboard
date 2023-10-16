@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CategoriesService } from 'src/app/services/categories.service';
-import {
-  CategoriesCollection,
-  FormCategory,
-} from 'src/app/model/category.interface';
+import { CategoryData, FormCategory } from 'src/app/model/category.interface';
 enum Actions {
   Add = 'Add',
   Edit = 'Edit',
@@ -16,7 +13,7 @@ enum Actions {
   styleUrls: ['./categories.component.scss'],
 })
 export class CategoriesComponent implements OnInit {
-  categoryCollection: CategoriesCollection[] | undefined;
+  categoryCollection: CategoryData[] | undefined;
   nameCategory: string | undefined;
   actionCategory: string | undefined;
   idCategory: string | undefined;
@@ -30,7 +27,7 @@ export class CategoriesComponent implements OnInit {
     this.loadingCategory = true;
     this.categoriesService
       .loadCategories()
-      .subscribe((categories: CategoriesCollection[]) => {
+      .subscribe((categories: CategoryData[]) => {
         this.categoryCollection = categories;
         this.loadingCategory = false;
       });
