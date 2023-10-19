@@ -13,11 +13,11 @@ import {
   PostDataUpdate,
 } from 'src/app/model/dataPostForm.interface';
 import { ToastrService } from 'ngx-toastr';
-import { tag } from 'rxjs-spy/operators';
 import { serverTimestamp } from 'firebase/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { TrimSpaces } from 'src/app/helpers/validators/post-title.validator';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 type FormValue = {
   title: string;
@@ -32,13 +32,15 @@ type FormControls<T> = {
   [P in keyof T]: AbstractControl<any, any>;
 };
 
+@UntilDestroy()
 @Component({
   selector: 'app-new-post',
   templateUrl: './new-post.component.html',
   styleUrls: ['./new-post.component.scss'],
 })
 export class NewPostComponent implements OnInit {
-  imgSrc: string | ArrayBuffer | null = './assets/images/no-img.png';
+  noImage = './assets/images/no-img.png';
+  imgSrc: string | ArrayBuffer | null = null;
   form: FormGroup;
   categories!: Category[];
   categoriesLoading = true;
@@ -57,6 +59,7 @@ export class NewPostComponent implements OnInit {
     private toastr: ToastrService,
     private route: ActivatedRoute,
   ) {
+    this.imgSrc = this.noImage;
     this.form = this.fb.group({
       title: [
         '',
@@ -86,6 +89,7 @@ export class NewPostComponent implements OnInit {
         this.postService
           .getPostById(params.id)
           .valueChanges()
+          .pipe(untilDestroyed(this))
           .subscribe((post) => {
             if (post) {
               this.post = post;
@@ -98,26 +102,32 @@ export class NewPostComponent implements OnInit {
 
   ngOnInit(): void {
     this.form.controls['permalink'].disable();
-    this.categoriesService.loadCategories().subscribe((categories) => {
-      this.categories = categories.map((category) => ({
-        category: category.data.category,
-        id: category.id,
-      }));
-      this.categoriesLoading = false;
+    this.categoriesService
+      .loadCategories()
+      .pipe(untilDestroyed(this))
+      .subscribe((categories) => {
+        this.categories = categories.map((category) => ({
+          category: category.data.category,
+          id: category.id,
+        }));
+        this.categoriesLoading = false;
 
-      if (this.isEditForm) {
-        this.isPostLoaded.subscribe((data) => {
-          this.setFormValue(data!);
-        });
-      }
-    });
+        if (this.isEditForm) {
+          this.isPostLoaded.subscribe((data) => {
+            if (data) {
+              this.setFormValue(data);
+              this.isPostLoaded.complete();
+            }
+          });
+        }
+      });
   }
 
   get FC(): FormControls<FormValue> {
     return this.form.controls as FormControls<FormValue>;
   }
 
-  setFormValue(data: DataPostForm): void {
+  private setFormValue(data: DataPostForm): void {
     const dataForm: any = {
       title: data.title,
       permalink: data.permalink,
@@ -159,65 +169,65 @@ export class NewPostComponent implements OnInit {
 
   onSubmit(): void {
     this.isSubmitting = true;
-    const postFormValue = {
+    const postFormValue: PostDataUpdate = {
       ...this.form.value,
       permalink: this.form.controls['permalink'].value,
-      // postImgPath: this.post ? this.post.postImgURL : null,
     };
     delete postFormValue.file;
     const postData: DataPostForm = {
       ...postFormValue,
       postImgURL: '',
-      postImgPath: `postImg/${Date.now()}`,
       isFeatured: false,
       views: 0,
       status: 'new',
       createdAt: serverTimestamp(),
+      postImgPath: `postImg/${Date.now()}`,
     };
 
     if (this.isEditForm && this.postId) {
-      this.onUpdatePost(this.postId, postFormValue, this.selectedImg);
-      return;
-    }
-
-    if (this.selectedImg) {
+      this.onUpdatePost(
+        this.postId,
+        postFormValue,
+        this.selectedImg,
+        this.post?.postImgPath,
+      );
+    } else if (this.selectedImg) {
       this.onSavePost(this.selectedImg, postData);
     }
   }
 
-  onUpdatePost(id: string, data: PostDataUpdate, file?: File): void {
-    this.postService
-      .updatePostById(id, data, file)
-      .pipe(tag('2'))
-      .subscribe({
-        next: (result) => {
-          this.isSubmitting = false;
-          this.toastr.success(result.resultText);
-        },
-        error: (error) => {
-          this.isSubmitting = false;
-          this.toastr.error(error.resultText);
-        },
-      });
+  private onUpdatePost(
+    id: string,
+    data: PostDataUpdate,
+    file?: File,
+    path?: string,
+  ): void {
+    this.postService.updatePostById(id, data, file, path).subscribe({
+      next: (result) => {
+        this.isSubmitting = false;
+        this.toastr.success(result.resultText);
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        this.toastr.error(error.resultText);
+      },
+    });
   }
 
-  onSavePost(img: File, data: DataPostForm): void {
-    this.postService
-      .saveDataPost(img, data)
-      .pipe(tag('1'))
-      .subscribe({
-        next: (result) => {
-          this.isSubmitting = false;
-          this.toastr.success(result.resultText);
-          this.form.reset();
-          this.imgSrc = './assets/images/no-img.png';
-        },
-        error: (error) => {
-          this.isSubmitting = false;
-          this.toastr.error(error.resultText);
-        },
-      });
+  private onSavePost(img: File, data: DataPostForm): void {
+    this.postService.saveDataPost(img, data).subscribe({
+      next: (result) => {
+        this.isSubmitting = false;
+        this.toastr.success(result.resultText);
+        this.form.reset();
+        this.imgSrc = this.noImage;
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        this.toastr.error(error.resultText);
+      },
+    });
   }
 }
-// remove tag
+
 // add loading... to image in form

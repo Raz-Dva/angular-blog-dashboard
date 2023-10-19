@@ -4,12 +4,14 @@ import { DashboardComponent } from 'src/app/dashboard/dashboard.component';
 import { CategoriesComponent } from 'src/app/categories/categories.component';
 import { AllPostsComponent } from 'src/app/posts/all-posts/all-posts.component';
 import { NewPostComponent } from 'src/app/posts/new-post/new-post.component';
+import { Testcom1Component } from 'src/app/dashboard/testcom1/testcom1.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'categories', component: CategoriesComponent },
   { path: 'posts', component: AllPostsComponent },
   { path: 'posts/new', component: NewPostComponent },
+  { path: 'test', component: Testcom1Component },
 ];
 
 @NgModule({

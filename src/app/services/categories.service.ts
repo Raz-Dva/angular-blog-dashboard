@@ -13,6 +13,7 @@ import { Collections } from 'src/app/enums/collections.enum';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { CategoryData } from 'src/app/model/category.interface';
+import {tag} from "rxjs-spy/operators";
 
 @Injectable({
   providedIn: 'root',

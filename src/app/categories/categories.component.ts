@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CategoriesService } from 'src/app/services/categories.service';
 import { CategoryData, FormCategory } from 'src/app/model/category.interface';
+import {UntilDestroy, untilDestroyed} from '@ngneat/until-destroy';
 enum Actions {
   Add = 'Add',
   Edit = 'Edit',
 }
 
+@UntilDestroy()
 @Component({
   selector: 'app-categories',
   templateUrl: './categories.component.html',
@@ -27,6 +29,7 @@ export class CategoriesComponent implements OnInit {
     this.loadingCategory = true;
     this.categoriesService
       .loadCategories()
+      .pipe(untilDestroyed(this))
       .subscribe((categories: CategoryData[]) => {
         this.categoryCollection = categories;
         this.loadingCategory = false;

@@ -8,8 +8,8 @@ import {
   AngularFirestore,
   AngularFirestoreDocument,
 } from '@angular/fire/compat/firestore';
-import { EMPTY, from, Observable, Subject } from 'rxjs';
-import { map, take, switchMap, catchError } from 'rxjs/operators';
+import { EMPTY, from, Observable, Subject, throwError } from 'rxjs';
+import { map, take, switchMap, catchError, tap } from 'rxjs/operators';
 import { tag } from 'rxjs-spy/operators';
 
 type SaveDataResult = { resultText: string; error?: any; data?: any };
@@ -30,7 +30,6 @@ export class PostsService {
 
     from(this.storage.upload(postData.postImgPath, image))
       .pipe(
-        tag('3'),
         switchMap(() => {
           return from(this.storage.ref(postData.postImgPath).getDownloadURL());
         }),
@@ -82,41 +81,66 @@ export class PostsService {
   }
 
   updatePostById(
+    // image during update is changing
     id: string,
     data: PostDataUpdate,
     file?: File,
+    path?: string,
   ): Observable<any> {
     const resultSubject = new Subject<any>();
-    console.log(data );
+    let updateObservable = from(this.store.doc(`posts/${id}`).update(data));
 
-    if (file && data.postImgPath) {
-      // const imagePath = `postImg/${Date.now()}`;
-      const ref = this.storage.ref(data.postImgPath);
-      const task = ref.put(file);
-      task.then((res) => {
-        console.log(res);
-      });
+    if (file && path) {
+      const storageRef = this.storage.ref(path);
+
+      updateObservable = from(storageRef.put(file)).pipe(
+        switchMap((task) => {
+          if (task.state === 'success') {
+            return storageRef.getDownloadURL();
+          } else {
+            return throwError(new Error('Error update image'));
+          }
+        }),
+        tap((URL) => {
+          data.postImgURL = URL;
+        }),
+        switchMap(() => {
+          return from(this.store.doc(`posts/${id}`).update(data));
+        }),
+      );
     }
 
-    this.store
-      .doc(`posts/${id}`)
-      .update(data)
-      .then(() => {
+    updateObservable
+      .pipe(
+        catchError((error) => {
+          const messageErr = error.message || 'Error update post';
+          this.handlerError(messageErr, resultSubject, error);
+          return EMPTY;
+        }),
+      )
+      .subscribe(() => {
         resultSubject.next({ resultText: 'Post updated successfully' });
-      })
-      .catch((error) => {
-        this.handlerError('Error upload', resultSubject, error);
       });
 
     return resultSubject.asObservable().pipe(take(1));
   }
 
-  deleteById(id: string): Promise<void> {
-    // also remove img
-    return this.store.doc(`posts/${id}`).delete();
+  deletePostById(id: string, imgPath: string): Observable<void> {
+    return this.storage
+      .ref(imgPath)
+      .delete()
+      .pipe(
+        switchMap((result) => {
+          return from(this.store.doc(`posts/${id}`).delete());
+        }),
+      );
   }
 
-  handlerError<T>(errorText: string, subject: Subject<T>, error?: Error) {
+  private handlerError<T>(
+    errorText: string,
+    subject: Subject<T>,
+    error?: Error,
+  ) {
     subject.error({ error, resultText: errorText });
     subject.complete();
   }

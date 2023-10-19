@@ -8,13 +8,14 @@ export interface DataPostForm {
     id: string;
   };
   postImgURL: string;
-  postImgPath: string;
   excerpt: string;
   content: string;
   isFeatured: boolean;
   views: number;
   status: string;
-  createdAt: firebase.firestore.Timestamp;
+  postImgPath: string;
+  createdAt: any;
+  // createdAt: firebase.firestore.Timestamp;
 }
 
 export interface Post {
@@ -23,13 +24,14 @@ export interface Post {
 }
 
 export interface PostDataUpdate {
-  title?: string;
-  permalink?: string;
-  category?: {
+  title: string;
+  permalink: string;
+  category: {
     category: string;
     id: string;
   };
-  excerpt?: string;
-  content?: string;
-  postImgPath?: string;
+  excerpt: string;
+  content: string;
+  file?: string;
+  postImgURL?: string;
 }

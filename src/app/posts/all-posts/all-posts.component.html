@@ -26,7 +26,7 @@
           <img
             src="{{post.data.postImgURL}}"
             (load)="loadingImages[post.id] = false"
-            alt="post image">uio
+            alt="post image">
         </div>
         <div *ngIf="loadingImages[post.id]" class="spinner">
           Loading...
@@ -38,7 +38,7 @@
       <td>{{post.data.createdAt.toMillis() | date:'yyyy/MM/dd h:mm:ss a'}}</td>
       <td>
         <button type="button" class="btn btn-primary" routerLink="/posts/new" [queryParams]="{id: post.id}">Edit</button>
-        <button type="button" class="btn btn-danger" (click)="removePost(post.id)">Delete</button>
+        <button type="button" class="btn btn-danger" (click)="removePost(post.id, post.data.postImgPath)">Delete</button>
       </td>
     </tr>
     </tbody>
