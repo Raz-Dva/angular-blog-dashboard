@@ -20,6 +20,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { HttpClientModule } from '@angular/common/http';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
+import { LoginComponent } from './auth/login/login/login.component';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AdminComponent } from './layouts/admin/admin.component';
+import { RegistrationComponent } from './auth/registration/registration.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +34,9 @@ import { AngularFireStorageModule } from '@angular/fire/compat/storage';
     CategoriesComponent,
     AllPostsComponent,
     NewPostComponent,
+    LoginComponent,
+    AdminComponent,
+    RegistrationComponent,
   ],
   imports: [
     BrowserModule,
@@ -37,6 +44,7 @@ import { AngularFireStorageModule } from '@angular/fire/compat/storage';
     FormsModule,
     AngularFirestoreModule,
     AngularFireStorageModule,
+    AngularFireAuthModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     AngularEditorModule,

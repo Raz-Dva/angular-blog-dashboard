@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import {
-  DataPostForm,
+  PostDataForm,
   PostDataUpdate,
+  PostFeaturedUpdate,
 } from 'src/app/model/dataPostForm.interface';
 import {
   AngularFirestore,
@@ -10,7 +11,6 @@ import {
 } from '@angular/fire/compat/firestore';
 import { EMPTY, from, Observable, Subject, throwError } from 'rxjs';
 import { map, take, switchMap, catchError, tap } from 'rxjs/operators';
-import { tag } from 'rxjs-spy/operators';
 
 type SaveDataResult = { resultText: string; error?: any; data?: any };
 
@@ -24,7 +24,7 @@ export class PostsService {
   ) {}
   saveDataPost(
     image: File,
-    postData: DataPostForm,
+    postData: PostDataForm,
   ): Observable<SaveDataResult> {
     const resultSubject = new Subject<SaveDataResult>();
 
@@ -76,12 +76,11 @@ export class PostsService {
       );
   }
 
-  getPostById(id: string): AngularFirestoreDocument<DataPostForm> {
-    return this.store.doc<DataPostForm>(`posts/${id}`);
+  getPostById(id: string): AngularFirestoreDocument<PostDataForm> {
+    return this.store.doc<PostDataForm>(`posts/${id}`);
   }
 
   updatePostById(
-    // image during update is changing
     id: string,
     data: PostDataUpdate,
     file?: File,
@@ -123,6 +122,10 @@ export class PostsService {
       });
 
     return resultSubject.asObservable().pipe(take(1));
+  }
+
+  updatePostFeatured(id: string, data: PostFeaturedUpdate): Observable<void> {
+    return from(this.store.doc(`posts/${id}`).update(data));
   }
 
   deletePostById(id: string, imgPath: string): Observable<void> {

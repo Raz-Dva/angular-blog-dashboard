@@ -14,17 +14,20 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 export class AllPostsComponent implements OnInit {
   posts: Post[] | undefined;
   loadingImages: { [key: string]: boolean } = {};
+  isLoadingPost = false;
   constructor(
     private postService: PostsService,
     private toastr: ToastrService,
   ) {}
 
   ngOnInit() {
+    this.isLoadingPost = true;
     this.postService
       .getAllPosts()
       .pipe(untilDestroyed(this))
       .subscribe((posts: Post[]) => {
         this.posts = posts;
+        this.isLoadingPost = false;
         this.posts.forEach((post) => {
           this.loadingImages[post.id] = true;
         });
@@ -32,6 +35,9 @@ export class AllPostsComponent implements OnInit {
   }
 
   removePost(id: string, path: string): void {
+    if (!confirm('Are you sure you want to delete the post?')) {
+      return;
+    }
     this.postService
       .deletePostById(id, path)
       .pipe(
@@ -44,6 +50,22 @@ export class AllPostsComponent implements OnInit {
         if (!doc.exists) {
           this.toastr.success('Post deleted successfully');
         }
+      });
+  }
+
+  markFeatured(id: string): void {
+    this.postService
+      .updatePostFeatured(id, { isFeatured: true })
+      .subscribe((res) => {
+        this.toastr.info('Featured Status Updated');
+      });
+  }
+
+  removeFeatured(id: string): void {
+    this.postService
+      .updatePostFeatured(id, { isFeatured: false })
+      .subscribe((res) => {
+        this.toastr.info('Featured Status Updated');
       });
   }
 }

@@ -1,23 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CategoriesService } from 'src/app/services/categories.service';
 import { Category } from 'src/app/model/category.interface';
 import { PostsService } from 'src/app/services/posts.service';
 import {
-  DataPostForm,
+  PostDataForm,
   PostDataUpdate,
 } from 'src/app/model/dataPostForm.interface';
 import { ToastrService } from 'ngx-toastr';
-import { serverTimestamp } from 'firebase/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { TrimSpaces } from 'src/app/helpers/validators/post-title.validator';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { Timestamp } from 'firebase/firestore';
+import { FormControls } from 'src/app/model/formControl.interface';
 
 type FormValue = {
   title: string;
@@ -26,10 +22,6 @@ type FormValue = {
   category: string;
   file: string;
   content: string;
-};
-
-type FormControls<T> = {
-  [P in keyof T]: AbstractControl<any, any>;
 };
 
 @UntilDestroy()
@@ -47,10 +39,10 @@ export class NewPostComponent implements OnInit {
   isSubmitting = false;
   title = 'Add';
   private selectedImg: File | undefined;
-  private post: DataPostForm | undefined;
+  private post: PostDataForm | undefined;
   private isEditForm = false;
   private postId: string | undefined;
-  private isPostLoaded = new BehaviorSubject<DataPostForm | null>(null);
+  private isPostLoaded = new BehaviorSubject<PostDataForm | null>(null);
 
   constructor(
     private fb: FormBuilder,
@@ -127,7 +119,7 @@ export class NewPostComponent implements OnInit {
     return this.form.controls as FormControls<FormValue>;
   }
 
-  private setFormValue(data: DataPostForm): void {
+  private setFormValue(data: PostDataForm): void {
     const dataForm: any = {
       title: data.title,
       permalink: data.permalink,
@@ -174,13 +166,13 @@ export class NewPostComponent implements OnInit {
       permalink: this.form.controls['permalink'].value,
     };
     delete postFormValue.file;
-    const postData: DataPostForm = {
+    const postData: PostDataForm = {
       ...postFormValue,
       postImgURL: '',
       isFeatured: false,
       views: 0,
       status: 'new',
-      createdAt: serverTimestamp(),
+      createdAt: Timestamp.now(),
       postImgPath: `postImg/${Date.now()}`,
     };
 
@@ -214,7 +206,7 @@ export class NewPostComponent implements OnInit {
     });
   }
 
-  private onSavePost(img: File, data: DataPostForm): void {
+  private onSavePost(img: File, data: PostDataForm): void {
     this.postService.saveDataPost(img, data).subscribe({
       next: (result) => {
         this.isSubmitting = false;
@@ -229,5 +221,3 @@ export class NewPostComponent implements OnInit {
     });
   }
 }
-
-// add loading... to image in form

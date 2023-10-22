@@ -1,0 +1,33 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div class="card p-5 shadow-effect bg-secondary-theme">
+        <div class="card-body">
+          <div class="text-center">
+            <h3 class="text-theme-primary">{{title}}</h3>
+            <p *ngIf="isLogin">Please log in as an administrator to publish a new blog post.</p>
+            <form [formGroup]="form" (ngSubmit)="onSubmit()" >
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Email" formControlName="email"
+                       [ngClass]="{'is-invalid': FC.email.touched && FC.email.invalid}">
+                <div *ngIf="FC.email.touched && FC.email.invalid" class="alert alert-danger">Enter your email in the correct format</div>
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" placeholder="Password" formControlName="password"
+                       [ngClass]="{'is-invalid': FC.password.touched && FC.password.invalid}">
+                <div *ngIf="FC.password.touched && FC.password.invalid" class="alert alert-danger">The password must not be less than 6 characters</div>
+
+              </div>
+              <button class="btn btn-info btn-block btn-theme"
+                      [disabled]="form.invalid || isSubmitting">{{title}}</button>
+            </form>
+            <div>
+              <a *ngIf="isLogin" routerLink="/registration">Register</a>
+              <a *ngIf="!isLogin" routerLink="/login">Sign In</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -4,6 +4,7 @@
   <br>
   <button class="btn btn-sm btn-info" routerLink="/">Back to dashboard</button>
   <br>
+  <p *ngIf="isLoadingPost">Loading ...</p>
   <table>
     <thead>
     <tr>
@@ -17,7 +18,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let post of posts; let i = index">
+    <tr *ngFor="let post of posts; let i = index; ">
       <td >
         {{i + 1}}
       </td>
@@ -35,10 +36,12 @@
       <td>{{post.data.title}}</td>
       <td>Excerpt</td>
       <td>{{post.data.category.category}}</td>
-      <td>{{post.data.createdAt.toMillis() | date:'yyyy/MM/dd h:mm:ss a'}}</td>
+      <td>{{post.data.createdAt.toDate() | date:'yyyy/MM/dd h:mm:ss a'}}</td>
       <td>
         <button type="button" class="btn btn-primary" routerLink="/posts/new" [queryParams]="{id: post.id}">Edit</button>
         <button type="button" class="btn btn-danger" (click)="removePost(post.id, post.data.postImgPath)">Delete</button>
+        <button *ngIf="!post.data.isFeatured" type="button" (click)="markFeatured(post.id)" class="btn btn-success">Mark Featured</button>
+        <button *ngIf="post.data.isFeatured" type="button" (click)="removeFeatured(post.id)" class="btn btn-info">Remove Featured</button>
       </td>
     </tr>
     </tbody>

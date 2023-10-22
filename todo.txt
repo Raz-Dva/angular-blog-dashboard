@@ -1,6 +1,8 @@
 - sticky footer
 - on category page add 'back to dashboard'
 - validation of category input
+-after remove all items will error
+- during loading all posts show Loading...
 
 remove rxjs spy
 change category to categoryName

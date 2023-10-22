@@ -1,6 +1,6 @@
-import firebase from 'firebase/compat';
+import { Timestamp } from 'firebase/firestore';
 
-export interface DataPostForm {
+export interface PostDataForm {
   title: string;
   permalink: string;
   category: {
@@ -14,12 +14,11 @@ export interface DataPostForm {
   views: number;
   status: string;
   postImgPath: string;
-  createdAt: any;
-  // createdAt: firebase.firestore.Timestamp;
+  createdAt: Timestamp;
 }
 
 export interface Post {
-  data: DataPostForm;
+  data: PostDataForm;
   id: string;
 }
 
@@ -34,4 +33,7 @@ export interface PostDataUpdate {
   content: string;
   file?: string;
   postImgURL?: string;
+}
+export interface PostFeaturedUpdate {
+  isFeatured: boolean;
 }
